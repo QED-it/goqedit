@@ -1,4 +1,4 @@
-# Go API client for sdk
+# Go API client for goqedit
 
 This SDK provides a programmatic way for interacting with QEDIT's _Asset Transfer_ API. The specification definition file is publicly available [in this repository](https://github.com/QED-it/asset_transfers_dev_guide/). 
 
@@ -22,7 +22,7 @@ go get github.com/antihax/optional
 
 Put the package under your project folder and add the following in import:
 ```golang
-import "./sdk"
+import "./goqedit"
 ```
 
 ## Documentation for API Endpoints
