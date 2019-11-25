@@ -17,7 +17,6 @@ Method | HTTP request | Description
 [**NodeGetTasksPost**](NodeApi.md#NodeGetTasksPost) | **Post** /node/get_tasks | Get a (potentially) filtered list of all Tasks
 [**NodeImportAuditorAccessWalletPost**](NodeApi.md#NodeImportAuditorAccessWalletPost) | **Post** /node/import_auditor_access_wallet | Import viewing credentials for a Wallet [async call]
 [**NodeImportWalletPost**](NodeApi.md#NodeImportWalletPost) | **Post** /node/import_wallet | Import Wallet from a known secret key and authorization [async call]
-[**NodeUnlockWalletPost**](NodeApi.md#NodeUnlockWalletPost) | **Post** /node/unlock_wallet | Unlocks a wallet for a given amount of seconds [async call]
 
 
 # **NodeApproveTaskPost**
@@ -49,7 +48,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **NodeCancelTaskPost**
-> NodeCancelTaskPost(ctx, taskActionRequest)
+> AsyncTaskCreatedResponse NodeCancelTaskPost(ctx, taskActionRequest)
 Cancel task with pending incoming transaction both incoming and outgoing [async call]
 
 A user may select to decline an incoming transaction. The related task will change its result to failure both on senders and the receivers side. This endpoint can also be used to cancel an outgoing pending transaction that is awaiting user interaction from the receiver
@@ -63,7 +62,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
- (empty response body)
+[**AsyncTaskCreatedResponse**](AsyncTaskCreatedResponse.md)
 
 ### Authorization
 
@@ -360,34 +359,6 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
   **importWalletRequest** | [**ImportWalletRequest**](ImportWalletRequest.md)|  | 
-
-### Return type
-
-[**AsyncTaskCreatedResponse**](AsyncTaskCreatedResponse.md)
-
-### Authorization
-
-[ApiKeyAuth](../README.md#ApiKeyAuth)
-
-### HTTP request headers
-
- - **Content-Type**: application/json
- - **Accept**: application/json
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
-
-# **NodeUnlockWalletPost**
-> AsyncTaskCreatedResponse NodeUnlockWalletPost(ctx, unlockWalletRequest)
-Unlocks a wallet for a given amount of seconds [async call]
-
-Causes a specified Wallet's secret key to be stored in-memory for a specified amount of time in order to increase transactional latency. Should only be used in cases where latency is highly sensitive.
-
-### Required Parameters
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-  **unlockWalletRequest** | [**UnlockWalletRequest**](UnlockWalletRequest.md)|  | 
 
 ### Return type
 

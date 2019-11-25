@@ -7,7 +7,7 @@ info:
   description: |
     This SDK provides a programmatic way for interacting with QEDIT's _Asset Transfer_ API. The specification definition file is publicly available [in this repository](https://github.com/QED-it/asset_transfers_dev_guide/).
   title: QEDIT - Asset Transfers
-  version: 1.6.1
+  version: 1.6.2
 servers:
 - url: http://{server_url}:{port}
   variables:
@@ -600,43 +600,6 @@ paths:
       summary: Import viewing credentials for a Wallet [async call]
       tags:
       - Node
-  /node/unlock_wallet:
-    post:
-      description: Causes a specified Wallet's secret key to be stored in-memory for a specified amount of time in order to increase transactional latency. Should only be used in cases where latency is highly sensitive.
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UnlockWalletRequest'
-        required: true
-      responses:
-        201:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AsyncTaskCreatedResponse'
-          description: Created
-        400:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: Bad request
-        401:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: Unauthorized
-        500:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: Internal error
-      summary: Unlocks a wallet for a given amount of seconds [async call]
-      tags:
-      - Node
   /node/get_rules:
     post:
       description: Returns a full list of all the Rules that govern admin and issuance rights within the network.
@@ -804,8 +767,12 @@ paths:
               $ref: '#/components/schemas/TaskActionRequest'
         required: true
       responses:
-        200:
-          description: Success
+        201:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AsyncTaskCreatedResponse'
+          description: A new task will be created and returned. If sender's cancellation is triggered, the task will be asynchronous and require the user to monitor its progress.
         400:
           content:
             application/json:
@@ -1173,7 +1140,7 @@ components:
         start_index: 0
         number_of_results: 10
         types:
-        - unlock_wallet
+        - delete_wallet
         - transfer_asset
         results:
         - in_progress
@@ -1270,7 +1237,6 @@ components:
     TaskType:
       description: Task type
       enum:
-      - unlock_wallet
       - transfer_asset
       - issue_asset
       - alter_rule
@@ -1278,6 +1244,7 @@ components:
       - delete_wallet
       - outgoing_confirm_request
       - incoming_confirm_request
+      - cancellation
       type: string
     TaskData:
       description: An object that includes additional request details
@@ -1657,27 +1624,6 @@ components:
       required:
       - wallet_id
       type: object
-    UnlockWalletRequest:
-      example:
-        wallet_id: source_wallet
-        authorization: PrivacyIsAwesome
-        seconds: 600
-      properties:
-        wallet_id:
-          description: The ID of the Wallet to unlock
-          type: string
-        authorization:
-          description: The authorization password for the Wallet
-          type: string
-        seconds:
-          description: The number of seconds to keep the Wallet unlocked
-          format: int32
-          type: integer
-      required:
-      - authorization
-      - seconds
-      - wallet_id
-      type: object
     CreateRuleRequest:
       example:
         wallet_id: issuer_wallet
@@ -1890,6 +1836,9 @@ components:
         binding_sig:
           description: The signature binding the spent and output Assets and verifying the balance
           type: string
+        confirmation_sig:
+          description: The signature of the confirming party if a confirmation was requested; empty if no confirmation was requested
+          type: string
       type: object
     AnalyticsRuleTx:
       description: The data of a particular Rule changing transaction
@@ -2043,6 +1992,9 @@ components:
         enc_sender:
           description: The Note encryption for the sender
           type: string
+        require_confirmation_from_rk:
+          description: The rerandomized (fully-anonymous) public key of the wallet that confirmed receipt of the output; identity of this wallet can only be recovered by the sending and confirming wallets (including view-only copies of these wallets); empty if no confirmation was requested
+          type: string
       type: object
     AnalyticsConfidentialIssuanceDescription:
       description: The details and Proof attached to a confidential Issuance; null if the Issuance was public
@@ -2154,6 +2106,9 @@ components:
           type: string
         recipient_address:
           description: The address of the Wallet the Assets were transferred to
+          type: string
+        confirmed_by:
+          description: The public key of the Wallet that confirmed receipt of this transfer
           type: string
         asset_id:
           description: |
